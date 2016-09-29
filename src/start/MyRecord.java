@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -23,23 +24,39 @@ public class MyRecord
 {
 	public static void main(String[] args) throws Exception
 	{
-
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		br.readLine();
 		// Thread.sleep(10000);
 		MyRecord mr = new MyRecord();
-		System.out.println("start recording");
+		System.out.println("start recording...");
 		mr.capture();
-		System.out.println("end recording");
+		System.out.println("end recording...");
 		mr.stopflag = true;
 		mr.save("zhangxu.mp3");
-
 		getWords s = new getWords();
-		String result = s.listen("zhangxu.mp3");
+		String sourceWords = s.listen("zhangxu.mp3");
+		String source = sourceWords.replace("[", "").replace("\"", "").replace("，","").replace("]", "");
+		System.out.println(source);
+		String result = checkKeyWords(source);		
 		System.out.println(result);
+	}
 
-		result = Tureing.ask(result);
-		System.out.println(result);
+	
+	/**
+	 * 关键词检测
+	 */
+	private static String checkKeyWords(String source) {
+		if (source.contains("场景识别")){
+			return "1";
+		}else if(source.contains("文字识别")){
+			return "2";
+		}else if(source.contains("路况识别")){
+			return "3";
+		}else {
+			//请求图灵机器人
+			String result = Tureing.ask(source);
+			return result;
+		}		
 	}
 
 	// 定义录音格式
